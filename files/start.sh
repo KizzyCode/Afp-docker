@@ -7,6 +7,7 @@ function create_user() {
 	# Get args
 	USERNAME="$1"
 	USERPASS="$2"
+	USERUID="$3"
 
 	# Check if the user exists already
 	if getent passwd "$USERNAME" >/dev/null; then
@@ -15,7 +16,7 @@ function create_user() {
 
 	# Create user and set password
 	echo "Creating user $USERNAME"
-	useradd --no-create-home --system --uid=1000 --shell=/sbin/nologin "$USERNAME"
+	useradd --no-create-home --system --uid="$USERUID" --shell=/sbin/nologin "$USERNAME"
 	echo "$USERNAME:$USERPASS" | chpasswd
 
 	# Create config
@@ -32,14 +33,16 @@ function create_users() {
 		# Create the variable names
 		USERNAME_VAR="AFP_USER${INDEX}_NAME"
 		USERPASS_VAR="AFP_USER${INDEX}_PASS"
+		USERUID_VAR="AFP_USER${INDEX}_UID"
 
 		# Resolve variables
 		USERNAME="${!USERNAME_VAR:-}"
 		USERPASS="${!USERPASS_VAR:-}"
+		USERUID="${!USERUID_VAR:-}"
 
 		# Check if the username is set
 		if test -n "$USERNAME"; then
-			create_user "$USERNAME" "$USERPASS"
+			create_user "$USERNAME" "$USERPASS" "$USERUID"
 		fi
 	done
 }
