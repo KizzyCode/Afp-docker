@@ -1,0 +1,6 @@
+
+[${USERNAME}]
+path = /var/afpshare/${USERNAME}
+valid users = ${USERNAME}
+time machine = yes
+vol size limit = 0

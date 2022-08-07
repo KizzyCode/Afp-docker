@@ -1,0 +1,6 @@
+# Ignore macOS files
+.DS_Store
+
+# Ignore example files
+example/testuser/*
+!example/testuser/Test.txt

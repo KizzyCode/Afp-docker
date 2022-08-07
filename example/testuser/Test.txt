@@ -1,0 +1,1 @@
+A simple test file that is published by the samba server.

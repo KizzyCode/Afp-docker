@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  afp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "548:548"
+    volumes:
+      - ./example:/var/afpshare:rw
+    environment:
+      AFP_USER0_NAME: testuser
+      AFP_USER0_PASS: testpass
