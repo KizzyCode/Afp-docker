@@ -2,52 +2,63 @@
 set -euo pipefail
 
 
-# Creates a single user
-function create_user() {
-	# Get args
-	USERNAME="$1"
-	USERPASS="$2"
-	USERUID="$3"
+# Setup the system user accounts
+function setup_users() {
+	# Print status
+    echo "*> Configuring system users..."
 
-	# Check if the user exists already
-	if getent passwd "$USERNAME" >/dev/null; then
-		return 0
-	fi
+    # Test for $USERS 
+    if test -z "${USERS:-}"; then
+        echo "!> Missing required environment variable \$USERS"
+        exit 1
+    fi
 
-	# Create user and set password
-	echo "Creating user $USERNAME"
-	useradd --no-create-home --system --uid="$USERUID" --shell=/sbin/nologin "$USERNAME"
-	echo "$USERNAME:$USERPASS" | chpasswd
+    # Configure users
+    echo "$USERS" | jq -c ".[]" | while read USER; do
+        # Parse JSON
+        USER_NAME=`echo "$USER" | jq -r ".username"`
+        USER_PASS=`echo "$USER" | jq -r ".password"`
+        USER_UID=`echo "$USER" | jq -r ".uid"`
 
-	# Create config
-	export USERNAME
-	export USERPASS
-	cat /etc/netatalk/afp.conf.user-template | envsubst >> /etc/netatalk/afp.conf
+		# Check if the user exists already
+		if getent passwd "$USER_NAME" >/dev/null; then
+			return 0
+		fi
+
+		# Create user and set password
+		echo "Creating user $USER_NAME"
+		useradd --no-create-home --system --uid="$USER_UID" --shell=/sbin/nologin "$USER_NAME"
+		echo "$USER_NAME:$USER_PASS" | chpasswd
+    done
 }
 
 
-# Creates all users
-function create_users() {
-	# Create users
-	for INDEX in `seq 0 127`; do
-		# Create the variable names
-		USERNAME_VAR="AFP_USER${INDEX}_NAME"
-		USERPASS_VAR="AFP_USER${INDEX}_PASS"
-		USERUID_VAR="AFP_USER${INDEX}_UID"
+# Setup the shares
+function setup_shares() {
+	# Print status
+    echo "*> Configuring shares..."
 
-		# Resolve variables
-		USERNAME="${!USERNAME_VAR:-}"
-		USERPASS="${!USERPASS_VAR:-}"
-		USERUID="${!USERUID_VAR:-}"
+    # Test for $SHARES 
+    if test -z "${SHARES:-}"; then
+        echo "!> Missing required environment variable \$SHARES"
+        exit 1
+    fi
 
-		# Check if the username is set
-		if test -n "$USERNAME"; then
-			create_user "$USERNAME" "$USERPASS" "$USERUID"
-		fi
-	done
+    # Configure users
+    echo "$SHARES" | jq -c ".[]" | while read SHARE; do
+        # Parse JSON
+        SHARE_USER=`echo "$SHARE" | jq -r ".username"`
+        SHARE_PATH=`echo "$SHARE" | jq -r ".path"`
+
+		# Create share
+		export SHARE_USER
+		export SHARE_PATH
+		cat /etc/netatalk/afp.conf.user-template | envsubst >> /etc/netatalk/afp.conf
+    done
 }
 
 
 # Create users and start supervisor
-create_users
+setup_users
+setup_shares
 exec supervisord -c "/etc/netatalk/supervisord.conf"

@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-ENV APT_PACKAGES gettext supervisor netatalk
+ENV APT_PACKAGES gettext jq supervisor netatalk
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
     && apt-get upgrade --yes \

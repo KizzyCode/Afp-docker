@@ -1,6 +1,6 @@
 
-[${USERNAME}]
-path = /var/afpshare/${USERNAME}
-valid users = ${USERNAME}
+[${SHARE_USER}]
+path = ${SHARE_PATH}
+valid users = ${SHARE_USER}
 time machine = yes
 vol size limit = 0

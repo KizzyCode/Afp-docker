@@ -9,6 +9,11 @@ services:
     volumes:
       - ./example:/var/afpshare:rw
     environment:
-      AFP_USER0_NAME: testuser
-      AFP_USER0_PASS: testpass
-      AFP_USER0_UID: 1000
+      USERS: |
+        [
+          { "username": "testuser", "password": "password", "uid": 1000 }
+        ]
+      SHARES: |
+        [
+          { "username": "testuser", "path": "/var/afpshare/testuser" }
+        ]
