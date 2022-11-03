@@ -29,6 +29,9 @@ function setup_users() {
 		echo "Creating user $USER_NAME"
 		useradd --no-create-home --system --uid="$USER_UID" --shell=/sbin/nologin "$USER_NAME"
 		echo "$USER_NAME:$USER_PASS" | chpasswd
+
+		# Print debug output
+		echo "  ... created user $USER_NAME with UID $USER_UID..."
     done
 }
 
@@ -54,6 +57,9 @@ function setup_shares() {
 		export SHARE_USER
 		export SHARE_PATH
 		cat /etc/netatalk/afp.conf.user-template | envsubst >> /etc/netatalk/afp.conf
+
+		# Print debug output
+		echo "  ... configured share for user $SHARE_USER at path $SHARE_PATH..."
     done
 }
 
