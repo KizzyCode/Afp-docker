@@ -4,3 +4,5 @@ path = ${SHARE_PATH}
 valid users = ${SHARE_USER}
 time machine = yes
 vol size limit = 0
+ea = sys
+unix priv = yes
